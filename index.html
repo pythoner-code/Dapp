@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ticket</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      .container {
+        width: 300px;
+        background-color: #fff;
+        border-radius: 5px;
+        padding: 20px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px; /* Add margin to separate the button from the input */
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <h1>One Day World Cup Tickets</h1>
+      <p>Purchse ticket for One Internation</p>
+      <button onclick="BuyTicket()">Click Here to buy ticket</button>
+      <button onclick="confirmTicket()">Click here to confirm purchase</button>
+    </div>
+
+    <script
+      src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"
+      type="application/javascript"
+    ></script>
+    <script>
+      const provider = new ethers.providers.Web3Provider(
+        window.ethereum,
+        "sepolia"
+      );
+
+      const TicketContractAddress =
+        "0xb137CBD8a42A87a61DfE5029AebA1d72e92e2B7e";
+      const TicketContractABI = [
+        {
+          inputs: [],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "balance",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "checkPurchase",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "num",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "owner",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "purchaseTicket",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "ticketPurchased",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+      ];
+
+      let TicketContract;
+      let signer;
+
+      provider.send("eth_requestAccounts", []).then(() => {
+        provider.listAccounts().then(function (accounts) {
+          signer = provider.getSigner(accounts[0]);
+          TicketContract = new ethers.Contract(
+            TicketContractAddress,
+            TicketContractABI,
+            signer
+          );
+        });
+      });
+
+      async function confirmTicket() {
+        const getMoodPromise = TicketContract.checkPurchase();
+        const Result = await getMoodPromise;
+        if (Result) {
+          console.log("You have purchased the tickets successfully");
+        } else {
+          console.log("You dont have any tickets");
+        }
+      }
+
+      async function BuyTicket() {
+        const tickets = TicketContract.purchaseTicket();
+        await tickets;
+      }
+    </script>
+  </body>
+</html>
